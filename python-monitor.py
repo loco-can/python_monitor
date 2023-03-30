@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 # Importing Libraries
+import os
 import serial
 import time
 import serial.tools.list_ports
@@ -14,11 +15,17 @@ def connect():
 
     ports = serial.tools.list_ports.comports()
 
+    if (os.name == 'posix'):
+        os_filter = "FT232"
+    else:
+        os_filter = "USB"
 
     # get USB ports with FT232 description
     for port, desc, hwid in sorted(ports):
 
-        if desc.find("FT232R") != -1:
+        print(port, ' ', desc)
+
+        if desc.find(os_filter) != -1:
 
             USBport = port
             USBname = desc
@@ -29,7 +36,7 @@ def connect():
     if USBport != False:
 
         print("connected to ", USBport, USBname)
-        return serial.Serial(port='/dev/ttyUSB1', baudrate=115200, timeout=.2)
+        return serial.Serial(port=USBport, baudrate=115200, timeout=.2)
 
     else:
         print("no active FT232 found");
@@ -55,6 +62,7 @@ def checksum(data):
 #     data = arduino.readline()
 #     return data
 
+print(os.name)
 
 arduino = False
 
